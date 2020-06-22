@@ -1,0 +1,21 @@
+language: java
+os: linux
+dist: bionic
+
+# Command to install dependencies
+before_install: pyenv global 3.6
+install:
+  - pip install ortools
+  - pip install git+https://github.com/snkas/python-ortools-lp-parser
+
+# Command to run tests
+before_script: cd quick
+script:
+  - bash clean.sh
+  - bash run_tests.sh
+  - bash maven_install.sh
+  - bash build_basic_sim_jar.sh
+  - bash run_examples.sh
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
