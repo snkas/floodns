@@ -22,333 +22,305 @@
 # SOFTWARE.
 ##
 
-import csv
 import numpy as np
 import os
 import sys
+import exputil
 
 
-# Usage print
-def print_usage():
-    print("floodns python analysis tool v0.01.6")
-    print("Usage: python analyze.py /path/to/run/folder")
+def analyze_flow_info(logs_floodns_dir, analysis_folder_dir):
 
+    # Read in all the columns
+    flows_info_csv_columns = exputil.read_csv_direct_in_columns(
+        logs_floodns_dir + '/flow_info.csv.log',
+        "pos_int,pos_int,pos_int,string,pos_int,pos_int,pos_int,pos_float,pos_float,string"
+    )
+    flow_id_list = flows_info_csv_columns[0]
+    source_id_list = flows_info_csv_columns[1]
+    target_id_list = flows_info_csv_columns[2]
+    path_list = flows_info_csv_columns[3]
+    path_length_list = list(map(lambda x: len(x.split(">")) - 1, path_list))
+    # start_time_list = flows_info_csv_columns[4]
+    # end_time_list = flows_info_csv_columns[5]
+    # duration_list = flows_info_csv_columns[6]
+    # total_sent_list = flows_info_csv_columns[7]
+    avg_throughput_list = flows_info_csv_columns[8]
+    # metadata_list = flows_info_csv_columns[9]
 
-# Check length of arguments
-if len(sys.argv) != 2:
-    print("Number of arguments must be exactly two: analyze.py and /path/to/run/folder.")
-    print_usage()
-    exit()
-
-# Check run folder path given as first argument
-run_folder_path = sys.argv[1]
-if not os.path.isdir(run_folder_path):
-    print("The run folder path does not exist: " + run_folder_path)
-    print_usage()
-    exit()
-
-# Create analysis folder
-analysis_folder_path = run_folder_path + '/analysis'
-if not os.path.exists(analysis_folder_path):
-    os.makedirs(analysis_folder_path)
-
-
-##################################
-# Analyze flow information
-#
-def analyze_flow_info():
-    with open(run_folder_path + '/flow_info.csv.log') as f:
-        reader = csv.reader(f)
-
-        # Column lists
-        flow_ids = []
-        source_ids = []
-        target_ids = []
-        paths = []
-        paths_lengths = []
-        start_time = []
-        end_time = []
-        duration = []
-        total_sent = []
-        avg_throughput = []
-
-        print("Reading in flow info log file...")
-
-        # Read in column lists
-        for row in reader:
-            flow_ids.append(float(row[0]))
-            source_ids.append(float(row[1]))
-            target_ids.append(float(row[2]))
-            paths.append(row[3])
-            paths_lengths.append(len(row[3].split(">")) - 1)
-            start_time.append(float(row[4]))
-            end_time.append(float(row[5]))
-            duration.append(float(row[6]))
-            total_sent.append(float(row[7]))
-            avg_throughput.append(float(row[8]))
-            if len(row) != 10:
-                print("Invalid row: ", row)
-                exit()
-
-        print("Calculating statistics...")
-
+    # Calculate some statistics
+    if len(flow_id_list) == 0:
         statistics = {
-            'all_flow_num': len(flow_ids),
-            'all_flow_num_unique_sources': len(set(source_ids)),
-            'all_flow_num_unique_targets': len(set(target_ids)),
-            'all_flow_avg_throughput_total': sum(avg_throughput),
-            'all_flow_avg_throughput_mean': np.mean(avg_throughput),
-            'all_flow_avg_throughput_median': np.median(avg_throughput),
-            'all_flow_avg_throughput_99th': np.percentile(avg_throughput, 99),
-            'all_flow_avg_throughput_99.9th': np.percentile(avg_throughput, 99.9),
-            'all_flow_avg_throughput_1th': np.percentile(avg_throughput, 1),
-            'all_flow_avg_throughput_0.1th': np.percentile(avg_throughput, 0.1),
-            'all_flow_path_length_mean': np.mean(paths_lengths),
-            'all_flow_path_length_median': np.median(paths_lengths),
-            'all_flow_path_length_99th': np.percentile(paths_lengths, 99),
-            'all_flow_path_length_99.9th': np.percentile(paths_lengths, 99.9),
-            'all_flow_path_length_1th': np.percentile(paths_lengths, 1),
-            'all_flow_path_length_0.1th': np.percentile(paths_lengths, 0.1),
+            'all_num_flows': len(flow_id_list)
         }
+        
+    else:
+        statistics = {
+            'all_num_flows': len(flow_id_list),
+            'all_flow_num_unique_sources': len(set(source_id_list)),
+            'all_flow_num_unique_targets': len(set(target_id_list)),
+    
+            'all_flow_avg_throughput_sum': sum(avg_throughput_list),
+            'all_flow_avg_throughput_min': np.min(avg_throughput_list),
+            'all_flow_avg_throughput_0.1th': np.percentile(avg_throughput_list, 0.1),
+            'all_flow_avg_throughput_1th': np.percentile(avg_throughput_list, 1),
+            'all_flow_avg_throughput_mean': np.mean(avg_throughput_list),
+            'all_flow_avg_throughput_median': np.median(avg_throughput_list),
+            'all_flow_avg_throughput_99th': np.percentile(avg_throughput_list, 99),
+            'all_flow_avg_throughput_99.9th': np.percentile(avg_throughput_list, 99.9),
+            'all_flow_avg_throughput_max': np.max(avg_throughput_list),
+    
+            'all_flow_path_length_min': np.min(path_length_list),
+            'all_flow_path_length_0.1th': np.percentile(path_length_list, 0.1),
+            'all_flow_path_length_1th': np.percentile(path_length_list, 1),
+            'all_flow_path_length_mean': np.mean(path_length_list),
+            'all_flow_path_length_median': np.median(path_length_list),
+            'all_flow_path_length_99th': np.percentile(path_length_list, 99),
+            'all_flow_path_length_99.9th': np.percentile(path_length_list, 99.9),
+            'all_flow_path_length_max': np.max(path_length_list),
+        }
+    
+    # Print results
+    output_filename = analysis_folder_dir + '/flow_info.statistics'
+    print('Writing flow statistics: ' + output_filename)
+    with open(output_filename, 'w+') as outfile:
+        for key, value in sorted(statistics.items()):
+            outfile.write(str(key) + "=" + str(value) + "\n")
 
-        # Print raw results
-        print('Writing to result file flow_info.statistics...')
-        with open(analysis_folder_path + '/flow_info.statistics', 'w+') as outfile:
-            for key, value in sorted(statistics.items()):
-                outfile.write(str(key) + "=" + str(value) + "\n")
 
+def analyze_connection_info(logs_floodns_dir, analysis_folder_dir):
 
-##################################
-# Analyze connection information
-#
-def analyze_connection_info(lower_threshold, upper_threshold):
-    with open(run_folder_path + '/connection_info.csv.log') as f:
-        reader = csv.reader(f)
-
-        # Column lists
-        connection_ids = []
-        source_ids = []
-        target_ids = []
-        total_size = []
-        total_sent = []
-        own_flows = []
-        own_flows_count = []
-        start_time = []
-        end_time = []
-        duration = []
-        fct = []
-        throughput = []
-        completed_throughput = []
-        completed = []
-
-        print("Reading in connection info log file...")
-
-        # Read in column lists
-        count_completed = 0
-        count_incomplete = 0
-        for row in reader:
-            if lower_threshold <= float(row[3]) <= upper_threshold:
-                connection_ids.append(float(row[0]))
-                source_ids.append(float(row[1]))
-                target_ids.append(float(row[2]))
-                total_size.append(float(row[3]))
-                total_sent.append(float(row[4]))
-                flow_ids_list = row[5].split(";")
-                own_flows_count.append(len(flow_ids_list))
-                own_flows.append(flow_ids_list)
-                start_time.append(float(row[6]))
-                end_time.append(float(row[7]))
-                duration.append(float(row[8]))
-                if row[10] == 'T':
-                    fct.append(float(row[8]))
-                    completed_throughput.append(float(row[9]))
-                throughput.append(float(row[9]))
-                completed.append(row[10] == 'T')
-                if row[10] == 'T':
-                    count_completed = count_completed + 1
-                else:
-                    count_incomplete = count_incomplete + 1
-                if len(row) != 12:
-                    print("Invalid row: ", row)
-                    exit()
-
-        print("Calculating statistics...")
-
-        if len(connection_ids) > 0:
-
-            statistics = {
-                'all_num_connections': len(connection_ids),
-                'all_num_connections_completed': count_completed,
-                'all_num_connections_incomplete': count_incomplete,
-                'all_num_connections_fraction_completed': float(count_completed) / float(len(connection_ids)),
-                'all_connection_num_unique_sources': len(set(source_ids)),
-                'all_connection_num_unique_targets': len(set(target_ids)),
-                'all_connection_throughput_total': sum(throughput),
-                'all_connection_throughput_mean': np.mean(throughput),
-                'all_connection_throughput_median': np.median(throughput),
-                'all_connection_throughput_99th': np.percentile(throughput, 99),
-                'all_connection_throughput_99.9th': np.percentile(throughput, 99.9),
-                'all_connection_throughput_1th': np.percentile(throughput, 1),
-                'all_connection_throughput_0.1th': np.percentile(throughput, 0.1),
-                'all_connection_num_flows_total': sum(own_flows_count),
-                'all_connection_num_flows_mean': np.mean(own_flows_count),
-                'all_connection_num_flows_median': np.median(own_flows_count),
-                'all_connection_num_flows_99th': np.percentile(own_flows_count, 99),
-                'all_connection_num_flows_99.9th': np.percentile(own_flows_count, 99.9),
-                'all_connection_num_flows_1th': np.percentile(own_flows_count, 1),
-                'all_connection_num_flows_0.1th': np.percentile(own_flows_count, 0.1),
-                'completed_connection_fct_mean': np.mean(fct),
-                'completed_connection_fct_median': np.median(fct),
-                'completed_connection_fct_99th': np.percentile(fct, 99),
-                'completed_connection_fct_99.9th': np.percentile(fct, 99.9),
-                'completed_connection_fct_1th': np.percentile(fct, 1),
-                'completed_connection_fct_0.1th': np.percentile(fct, 0.1),
-                'completed_connection_throughput_mean': np.mean(completed_throughput),
-                'completed_connection_throughput_median': np.median(completed_throughput),
-                'completed_connection_throughput_99th': np.percentile(completed_throughput, 99),
-                'completed_connection_throughput_99.9th': np.percentile(completed_throughput, 99.9),
-                'completed_connection_throughput_1th': np.percentile(completed_throughput, 1),
-                'completed_connection_throughput_0.1th': np.percentile(completed_throughput, 0.1),
-            }
+    # Read in all the columns
+    flows_info_csv_columns = exputil.read_csv_direct_in_columns(
+        logs_floodns_dir + '/connection_info.csv.log',
+        "pos_int,pos_int,pos_int,pos_float,pos_float,string,pos_int,pos_int,pos_int,pos_float,string,string"
+    )
+    connection_id_list = flows_info_csv_columns[0]
+    source_id_list = flows_info_csv_columns[1]
+    target_id_list = flows_info_csv_columns[2]
+    # total_size_list = flows_info_csv_columns[3]
+    # total_sent_list = flows_info_csv_columns[4]
+    # flows_string_list = flows_info_csv_columns[5]
+    # num_flows_list = list(map(lambda x: len(x.split(";")), flows_string_list))
+    # start_time_list = flows_info_csv_columns[6]
+    # end_time_list = flows_info_csv_columns[7]
+    duration_list = flows_info_csv_columns[8]
+    avg_throughput_list = flows_info_csv_columns[9]
+    completed_string_list = flows_info_csv_columns[10]
+    completed_list = []
+    count_completed = 0
+    count_incomplete = 0
+    for c in completed_string_list:
+        if c == "T":
+            completed_list.append(True)
+            count_completed += 1
+        elif c == "F":
+            completed_list.append(False)
+            count_incomplete += 1
         else:
-            statistics = {
-                'all_num_connections': 0
-            }
+            raise ValueError("Invalid completed value: " + c)
+    # metadata_list = flows_info_csv_columns[11]
 
-        # Print raw results
-        statistics_filename = format(
-            "%s/connection_info_lb_%d_ub_%d.statistics" %
-            (analysis_folder_path,
-             lower_threshold,
-             upper_threshold)
-        )
+    # Calculate some statistics
+    if len(connection_id_list) == 0:
+        statistics = {
+            'all_num_connections': len(connection_id_list),
+        }
+        
+    else:
 
-        print('Writing to result file %s...' % statistics_filename)
-        with open(statistics_filename, 'w+') as outfile:
-            for key, value in sorted(statistics.items()):
-                outfile.write(str(key) + "=" + str(value) + "\n")
+        statistics = {
+            'all_num_connections': len(connection_id_list),
+            'all_num_connections_completed': count_completed,
+            'all_num_connections_incomplete': count_incomplete,
+            'all_num_connections_fraction_completed': float(count_completed) / float(len(connection_id_list)),
+            'all_connection_num_unique_sources': len(set(source_id_list)),
+            'all_connection_num_unique_targets': len(set(target_id_list)),
+
+            'all_connection_avg_throughput_min': np.min(avg_throughput_list),
+            'all_connection_avg_throughput_0.1th': np.percentile(avg_throughput_list, 0.1),
+            'all_connection_avg_throughput_1th': np.percentile(avg_throughput_list, 1),
+            'all_connection_avg_throughput_mean': np.mean(avg_throughput_list),
+            'all_connection_avg_throughput_median': np.median(avg_throughput_list),
+            'all_connection_avg_throughput_99th': np.percentile(avg_throughput_list, 99),
+            'all_connection_avg_throughput_99.9th': np.percentile(avg_throughput_list, 99.9),
+            'all_connection_avg_throughput_max': np.max(avg_throughput_list),
+            'all_connection_avg_throughput_sum': sum(avg_throughput_list),
+        }
+
+        completion_time = []
+        completion_throughput = []
+        for i in range(len(connection_id_list)):
+            if completed_list[i]:
+                completion_time.append(duration_list[i])
+                completion_throughput.append(avg_throughput_list[i])
+
+        if count_completed > 0:
+            statistics.update({
+                'completed_connection_completion_time_min': np.min(completion_time),
+                'completed_connection_completion_time_0.1th': np.percentile(completion_time, 0.1),
+                'completed_connection_completion_time_1th': np.percentile(completion_time, 1),
+                'completed_connection_completion_time_mean': np.mean(completion_time),
+                'completed_connection_completion_time_median': np.median(completion_time),
+                'completed_connection_completion_time_99th': np.percentile(completion_time, 99),
+                'completed_connection_completion_time_99.9th': np.percentile(completion_time, 99.9),
+                'completed_connection_completion_time_max': np.max(completion_time),
+
+                'completed_connection_throughput_min': np.min(completion_throughput),
+                'completed_connection_throughput_0.1th': np.percentile(completion_throughput, 0.1),
+                'completed_connection_throughput_1th': np.percentile(completion_throughput, 1),
+                'completed_connection_throughput_mean': np.mean(completion_throughput),
+                'completed_connection_throughput_median': np.median(completion_throughput),
+                'completed_connection_throughput_99th': np.percentile(completion_throughput, 99),
+                'completed_connection_throughput_99.9th': np.percentile(completion_throughput, 99.9),
+                'completed_connection_throughput_max': np.max(completion_throughput),
+            })
+
+    # Print raw results
+    output_filename = analysis_folder_dir + '/connection_info.statistics'
+    print('Writing connection statistics: %s' % output_filename)
+    with open(output_filename, 'w+') as outfile:
+        for key, value in sorted(statistics.items()):
+            outfile.write(str(key) + "=" + str(value) + "\n")
 
 
-##################################
-# Analyze link information
-#
-def analyze_link_info():
-    with open(run_folder_path + '/link_info.csv.log') as f:
-        reader = csv.reader(f)
+def analyze_link_info(logs_floodns_dir, analysis_folder_dir):
 
-        # Column lists
-        link_id = []
-        source_id = []
-        target_id = []
-        start_time = []
-        end_time = []
-        duration = []
-        avg_utilization = []
-        avg_active_flows = []
-        num_link_utilization_zero = 0
-        num_link_utilization_non_zero = 0
+    # Read in all the columns
+    link_info_csv_columns = exputil.read_csv_direct_in_columns(
+        logs_floodns_dir + '/link_info.csv.log',
+        "pos_int,pos_int,pos_int,pos_int,pos_int,pos_int,pos_float,pos_float,string"
+    )
+    link_id_list = link_info_csv_columns[0]
+    source_id_list = link_info_csv_columns[1]
+    target_id_list = link_info_csv_columns[2]
+    # start_time_list = link_info_csv_columns[3]
+    # end_time_list = link_info_csv_columns[4]
+    # duration_list = link_info_csv_columns[5]
+    avg_utilization_list = link_info_csv_columns[6]
+    # avg_active_flows_list = link_info_csv_columns[7]
+    # metadata_list = link_info_csv_columns[8]
 
-        print("Reading in link info log file...")
+    # Count how many links had utilization of zero
+    num_link_inactive = 0
+    num_link_active = 0
+    for u in avg_utilization_list:
+        if u == 0:
+            num_link_inactive += 1
+        else:
+            num_link_active += 1
 
-        # Read in column lists
-        for row in reader:
-            link_id.append(float(row[0]))
-            source_id.append(float(row[1]))
-            target_id.append(float(row[2]))
-            start_time.append(float(row[3]))
-            end_time.append(float(row[4]))
-            duration.append(float(row[5]))
-            avg_utilization.append(float(row[6]))
-            avg_active_flows.append(float(row[7]))
-            if float(row[6]) == 0:
-                num_link_utilization_zero = num_link_utilization_zero + 1
-            else:
-                num_link_utilization_non_zero = num_link_utilization_non_zero + 1
-
-            if len(row) != 9:
-                print("Invalid row: ", row)
-                exit()
-
-        print("Calculating statistics...")
+    # Calculate some statistics
+    if len(link_id_list) == 0:
+        statistics = {
+            'all_num_links': len(link_id_list),
+        }
+    else:
 
         # General statistics
         statistics = {
-            'all_link_num': len(link_id),
-            'all_link_num_active': num_link_utilization_non_zero,
-            'all_link_num_inactive': num_link_utilization_zero,
-            'all_link_unique_sources': len(set(source_id)),
-            'all_link_unique_targets': len(set(target_id)),
-            'all_link_avg_utilization_mean': np.mean(avg_utilization),
-            'all_link_avg_utilization_median': np.median(avg_utilization),
-            'all_link_avg_utilization_std': np.std(avg_utilization),
-            'all_link_avg_utilization_99th': np.percentile(avg_utilization, 99),
-            'all_link_avg_utilization_99.9th': np.percentile(avg_utilization, 99.9),
-            'all_link_avg_utilization_1th': np.percentile(avg_utilization, 1),
-            'all_link_avg_utilization_0.1th': np.percentile(avg_utilization, 0.1),
+            'all_num_links': len(link_id_list),
+            'all_num_links_active': num_link_active,
+            'all_num_links_inactive': num_link_inactive,
+            'all_link_unique_sources': len(set(source_id_list)),
+            'all_link_unique_targets': len(set(target_id_list)),
+
+            'all_link_avg_utilization_min': np.min(avg_utilization_list),
+            'all_link_avg_utilization_0.1th': np.percentile(avg_utilization_list, 0.1),
+            'all_link_avg_utilization_1th': np.percentile(avg_utilization_list, 1),
+            'all_link_avg_utilization_mean': np.mean(avg_utilization_list),
+            'all_link_avg_utilization_median': np.median(avg_utilization_list),
+            'all_link_avg_utilization_std': np.std(avg_utilization_list),
+            'all_link_avg_utilization_99th': np.percentile(avg_utilization_list, 99),
+            'all_link_avg_utilization_99.9th': np.percentile(avg_utilization_list, 99.9),
+            'all_link_avg_utilization_max': np.max(avg_utilization_list),
         }
 
-        # Print raw results
-        print('Writing to result file link_info.statistics...')
-        with open(analysis_folder_path + '/link_info.statistics', 'w+') as outfile:
-            for key, value in sorted(statistics.items()):
-                outfile.write(str(key) + "=" + str(value) + "\n")
+    # Print raw results
+    output_filename = analysis_folder_dir + '/link_info.statistics'
+    print('Writing link statistics: %s' % output_filename)
+    with open(output_filename, 'w+') as outfile:
+        for key, value in sorted(statistics.items()):
+            outfile.write(str(key) + "=" + str(value) + "\n")
 
 
-##################################
-# Analyze node information
-#
-def analyze_node_info():
-    with open(run_folder_path + '/node_info.csv.log') as f:
-        reader = csv.reader(f)
+def analyze_node_info(logs_floodns_dir, analysis_folder_dir):
 
-        # Column lists
-        node_id = []
-        avg_active_flows = []
-        num_node_active = 0
-        num_node_inactive = 0
+    # Read in all the columns
+    link_info_csv_columns = exputil.read_csv_direct_in_columns(
+        logs_floodns_dir + '/node_info.csv.log',
+        "pos_int,pos_float,string"
+    )
+    node_id_list = link_info_csv_columns[0]
+    avg_active_flows_list = link_info_csv_columns[1]
+    # metadata_list = link_info_csv_columns[2]
 
-        print("Reading in node info log file...")
+    # Count how many nodes did not see any flows
+    num_node_inactive = 0
+    num_node_active = 0
+    for a in avg_active_flows_list:
+        if a == 0:
+            num_node_inactive += 1
+        else:
+            num_node_active += 1
 
-        # Read in column lists
-        for row in reader:
-            node_id.append(float(row[0]))
-            avg_active_flows.append(float(row[1]))
-            if float(row[1]) == 0:
-                num_node_inactive = num_node_inactive + 1
-            else:
-                num_node_active = num_node_active + 1
-
-            if len(row) != 3:
-                print("Invalid row: ", row)
-                exit()
-
-        print("Calculating statistics...")
+    # Calculate some statistics
+    if len(node_id_list) == 0:
+        statistics = {
+            'all_num_nodes': len(node_id_list),
+        }
+    else:
 
         # General statistics
         statistics = {
-            'all_node_num': len(node_id),
-            'all_node_num_active': num_node_active,
-            'all_node_num_inactive': num_node_inactive,
-            'all_node_avg_num_active_flows_mean': np.mean(avg_active_flows),
-            'all_node_avg_num_active_flows_median': np.median(avg_active_flows),
-            'all_node_avg_num_active_flows_std': np.std(avg_active_flows),
-            'all_node_avg_num_active_flows_99th': np.percentile(avg_active_flows, 99),
-            'all_node_avg_num_active_flows_99.9th': np.percentile(avg_active_flows, 99.9),
-            'all_node_avg_num_active_flows_1th': np.percentile(avg_active_flows, 1),
-            'all_node_avg_num_active_flows_0.1th': np.percentile(avg_active_flows, 0.1),
+            'all_num_nodes': len(node_id_list),
+            'all_num_nodes_active': num_node_active,
+            'all_num_nodes_inactive': num_node_inactive,
+
+            'all_node_avg_num_active_flows_min': np.min(avg_active_flows_list),
+            'all_node_avg_num_active_flows_1th': np.percentile(avg_active_flows_list, 1),
+            'all_node_avg_num_active_flows_0.1th': np.percentile(avg_active_flows_list, 0.1),
+            'all_node_avg_num_active_flows_mean': np.mean(avg_active_flows_list),
+            'all_node_avg_num_active_flows_median': np.median(avg_active_flows_list),
+            'all_node_avg_num_active_flows_std': np.std(avg_active_flows_list),
+            'all_node_avg_num_active_flows_99th': np.percentile(avg_active_flows_list, 99),
+            'all_node_avg_num_active_flows_99.9th': np.percentile(avg_active_flows_list, 99.9),
+            'all_node_avg_num_active_flows_max': np.max(avg_active_flows_list),
         }
 
-        # Print raw results
-        print('Writing to result file node_info.statistics...')
-        with open(analysis_folder_path + '/node_info.statistics', 'w+') as outfile:
-            for key, value in sorted(statistics.items()):
-                outfile.write(str(key) + "=" + str(value) + "\n")
+    # Print raw results
+    output_filename = analysis_folder_dir + '/node_info.statistics'
+    print('Writing node statistics: %s' % output_filename)
+    with open(output_filename, 'w+') as outfile:
+        for key, value in sorted(statistics.items()):
+            outfile.write(str(key) + "=" + str(value) + "\n")
 
 
-##################################
-# Call analysis functions
-#
-analyze_flow_info()
-analyze_connection_info(0, 10000000000)
-analyze_link_info()
-analyze_node_info()
+def main():
+    args = sys.argv[1:]
+    if len(args) != 1:
+        print("Must supply exactly one argument")
+        print("Usage: python analyze.py [/path/to/run_folder/logs_floodns]")
+        exit(1)
+    else:
+
+        # Check run folder path given as first argument
+        logs_floodns_dir = sys.argv[1]
+        if not os.path.isdir(logs_floodns_dir):
+            print("The logs_floodns directory does not exist: " + logs_floodns_dir)
+            exit()
+
+        # Create analysis folder
+        analysis_folder_dir = logs_floodns_dir + '/analysis'
+        if not os.path.exists(analysis_folder_dir):
+            os.makedirs(analysis_folder_dir)
+        print("Output directory for analysis: " + analysis_folder_dir)
+
+        # Perform all four analyses
+        analyze_flow_info(logs_floodns_dir, analysis_folder_dir)
+        analyze_connection_info(logs_floodns_dir, analysis_folder_dir)
+        analyze_link_info(logs_floodns_dir, analysis_folder_dir)
+        analyze_node_info(logs_floodns_dir, analysis_folder_dir)
+
+
+if __name__ == "__main__":
+    main()

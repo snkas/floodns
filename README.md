@@ -19,10 +19,16 @@ As a consequence, simulating large flows is generally quicker because the runtim
 * Gnuplot 4.4 or higher (check: `gnuplot --version`)
 * OR-tools and ortoolslpparser to solve linear programs from file:
 
-```bash
-pip install ortools
-pip install git+https://github.com/snkas/python-ortools-lp-parser
-```
+  ```bash
+  pip install ortools
+  pip install git+https://github.com/snkas/python-ortools-lp-parser
+  ```
+
+* To use the analysis functionality you need the exputil Python package:
+
+  ```bash
+  pip install git+https://github.com/snkas/exputilpy
+  ```
 
 ### Building
 
