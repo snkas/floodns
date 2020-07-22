@@ -112,7 +112,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(0-2, 1-3, 2-4, 3-4)",
-                "map(0-2: 10, 1-3: 5, 2-4: 10, 3-4: 8)"
+                "map(0-2: 10, 2-0: 9, 1-3: 5, 3-1: 5, 2-4: 10, 4-2: 10, 3-4: 8, 4-3: 4)"
         );
 
         // Check topology is created properly
@@ -121,6 +121,10 @@ public class FileToTopologyConverterTest {
         assertEquals(topology.getNetwork().getPresentLinksBetween(1, 3).get(0).getCapacity(), 5, 0.000001);
         assertEquals(topology.getNetwork().getPresentLinksBetween(2, 4).get(0).getCapacity(), 10.0, 0.000001);
         assertEquals(topology.getNetwork().getPresentLinksBetween(3, 4).get(0).getCapacity(), 8.0, 0.000001);
+        assertEquals(topology.getNetwork().getPresentLinksBetween(2, 0).get(0).getCapacity(), 9.0, 0.000001);
+        assertEquals(topology.getNetwork().getPresentLinksBetween(3, 1).get(0).getCapacity(), 5, 0.000001);
+        assertEquals(topology.getNetwork().getPresentLinksBetween(4, 2).get(0).getCapacity(), 10.0, 0.000001);
+        assertEquals(topology.getNetwork().getPresentLinksBetween(4, 3).get(0).getCapacity(), 4.0, 0.000001);
 
         // Clean-up of file
         assertTrue(tempTopology.delete());
@@ -138,6 +142,27 @@ public class FileToTopologyConverterTest {
                 "set(2, 3)",
                 "set()",
                 "map()"
+        );
+
+        // Check topology is created properly
+        FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testSingleLinkDataRateMap() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                2,
+                1,
+                "set()",
+                "set(0, 1)",
+                "set(0, 1)",
+                "set(0-1)",
+                "map(0-1: 5, 1-0: 5)"
         );
 
         // Check topology is created properly

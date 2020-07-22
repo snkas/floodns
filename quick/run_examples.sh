@@ -4,5 +4,5 @@ for experiment in "example_single" "example_ring" "example_leaf_spine" "example_
 do
   rm -rf ../runs/${experiment}/logs_floodns
   mkdir ../runs/${experiment}/logs_floodns
-  java -jar floodns-basic-sim.jar "../runs/${experiment}" 2>&1 | tee ../runs/${experiment}/logs_floodns/console.txt
+  java -jar floodns-basic-sim.jar "../runs/${experiment}" 2>&1 | tee ../runs/${experiment}/logs_floodns/console.txt || exit 1
 done

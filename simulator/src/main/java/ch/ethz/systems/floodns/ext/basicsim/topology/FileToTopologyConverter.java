@@ -133,7 +133,7 @@ public class FileToTopologyConverter {
 
                 // Add to network
                 network.addLink(from, to, linkToCapacity.get(pair));
-                network.addLink(to, from, linkToCapacity.get(pair));
+                network.addLink(to, from, linkToCapacity.get(new ImmutablePair<>(to, from)));
 
             }
 
@@ -260,7 +260,7 @@ public class FileToTopologyConverter {
                     Pair<Integer, Integer> edge = new ImmutablePair<>(parsePositiveInteger(dashSplit[0].trim()), parsePositiveInteger(dashSplit[1].trim()));
 
                     // (a, b) must be in the topology
-                    if (!edgeList.contains(edge)) {
+                    if (!edgeList.contains(edge) && !edgeList.contains(new ImmutablePair<>(edge.getRight(), edge.getLeft()))) {
                         throw new IllegalArgumentException("Edge does not exist: " + edge);
                     }
 
@@ -275,7 +275,7 @@ public class FileToTopologyConverter {
             }
 
             // Check all edges are in the mapping
-            if (result.size() != edgeList.size()) {
+            if (result.size() != edgeList.size() * 2) {
                 throw new IllegalArgumentException("Not all edges were covered");
             }
 
