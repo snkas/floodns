@@ -10,7 +10,6 @@ As a consequence, simulating large flows is generally quicker because the runtim
 
 ## Overview
 
-
 ### Requirements
 
 * Java 7 or higher (check: `java -version`)

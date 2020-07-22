@@ -90,39 +90,57 @@ A CSV log consists of new line (\r\n) separated entries. Each entry is comma-sep
 
 * **flow_bandwidth.csv.log:** for each flow all the intervals of bandwidth. 
 
-  `[flow_id],[interval_start_time],[interval_end_time],[bandwidth]`
+  ```
+  [flow_id],[interval_start_time],[interval_end_time],[bandwidth]
+  ```
   
 * **flow_info.csv.log**: aggregate information for each flow.
 
-  `[flow_id],[source_node_id],[dest_node_id],[PATH],[start_time],[end_time],[duration],[amount_sent],[average_bandwidth],[metadata]`
+  ```
+  [flow_id],[source_node_id],[dest_node_id],[PATH],[start_time],[end_time],[duration],[amount_sent],[average_bandwidth],[metadata]
+  ```
 
 * **link_info.csv.log**: aggregate information for each link.
 
-  `[link_id],[from_node_id],[to_node_id],[start_time],[end_time],[duration],[average_utilization],[average_number_active_flows],[metadata]`
+  ```
+  [link_id],[from_node_id],[to_node_id],[start_time],[end_time],[duration],[average_utilization],[average_number_active_flows],[metadata]
+  ```
 
 * **link_num_active_flows.csv.log**: for each link all the intervals of number of active flows.
 
-  `[link_id],[from_node_id],[to_node_id],[interval_start_time],[interval_end_time],[number_active_flows]`
+  ```
+  [link_id],[from_node_id],[to_node_id],[interval_start_time],[interval_end_time],[number_active_flows]
+  ```
 
 * **link_utilization.csv.log**: for each link all the intervals of utilization.
 
-  `[link_id],[from_node_id],[to_node_id],[interval_start_time],[interval_end_time],[utilization]`
+  ```
+  [link_id],[from_node_id],[to_node_id],[interval_start_time],[interval_end_time],[utilization]
+  ```
 
 * **node_info.csv.log:** aggregate node information for each node.
 
-  `[node_id],[average_number_active_flows],[metadata]`
+  ```
+  [node_id],[average_number_active_flows],[metadata]
+  ```
   
 * **node_num_active_flows.csv.log:** for each node all the intervals of number of active flows.
 
-  `[node_id],[interval_start_time],[interval_end_time],[number_active_flows]`
+  ```
+  [node_id],[interval_start_time],[interval_end_time],[number_active_flows]
+  ```
 
 * **connection_bandwidth.csv.log:** for each connection all the intervals of bandwidth.
 
-  `[connection_id],[interval_start_time],[interval_end_time],[bandwidth]`
+  ```
+  [connection_id],[interval_start_time],[interval_end_time],[bandwidth]
+  ```
 
 * **connection_info.csv.log:** aggregate information for each connection.
 
-  `[connection_id],[source_node_id],[dest_node_id],[total_size],[amount_sent],[FLOW_LIST],[start_time],[end_time],[duration],[average_bandwidth],[COMPLETED],[metadata]`
+  ```
+  [connection_id],[source_node_id],[dest_node_id],[total_size],[amount_sent],[FLOW_LIST],[start_time],[end_time],[duration],[average_bandwidth],[COMPLETED],[metadata]
+  ```
 
 In which the special formats are:
 
