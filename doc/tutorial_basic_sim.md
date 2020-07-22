@@ -1,6 +1,6 @@
 # Tutorial: basic simulation
 
-## A first run
+## Getting started
 
 1. In the README tutorial you generated the executable jar `floodns-basic-sim.jar` in the `simulator` folder. This is now used as our primary executable.
 
@@ -13,14 +13,36 @@
    As an example, execute:
    
    ```
+   # (cd to the root floodns folder)
    cd simulator
-   java -jar floodns-basic-sim.jar ../runs/example_single
+   java -jar floodns-basic-sim.jar ../runs/example_two_tors
    ```
    
-3. Now you can find log files as output in `../runs/example_single/logs_floodns`, e.g. you can see:
+3. Now you can find log files as output:
 
    ```
-   xdg-open ../runs/example_single/logs_floodns/connection_info.csv.log
+   # (cd to the root floodns folder)
+   cd runs/example_two_tors/logs_floodns
+   ls
+   ```
+   
+4. You can also make the connection log a bit more human-readable for convenience:
+
+   ```
+   # (cd to the root floodns folder)
+   cd simulator/external
+   python convert_connection_info_to_human_readable.py ../../runs/example_two_tors/logs_floodns
+   ```
+   
+5. Now `runs/example_two_tors/logs_floodns/connection_info.log.txt` will have the following content:
+
+   ```
+   Conn. ID   Source   Target   Size           Sent           Flows' IDs     Start time (ns)    End time (ns)      Duration         Progress     Avg. rate        Finished?     Metadata
+   0          2        5        800.00 Mbit    166.67 Mbit    0              0                  5000000000         5000.00 ms       20.83%       33.33 Mbit/s     NO 
+   1          2        5        800.00 Mbit    166.67 Mbit    1              0                  5000000000         5000.00 ms       20.83%       33.33 Mbit/s     NO 
+   2          3        5        800.00 Mbit    166.67 Mbit    2              0                  5000000000         5000.00 ms       20.83%       33.33 Mbit/s     NO 
+   3          4        6        800.00 Mbit    500.00 Mbit    3              0                  5000000000         5000.00 ms       62.50%       100.00 Mbit/s    NO 
+   4          2        3        800.00 Mbit    166.67 Mbit    4              0                  5000000000         5000.00 ms       20.83%       33.33 Mbit/s     NO 
    ```
 
 ## Run folder
