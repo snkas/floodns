@@ -35,7 +35,6 @@ General properties of the simulation. The following are already defined:
 * `filename_schedule` : Schedule filename (relative to run folder)
 * `simulation_end_time_ns` : How long to run the simulation in simulation time (ns)
 * `simulation_seed` : If there is randomness present in the simulation, this guarantees reproducibility (exactly the same outcome) if the seed is the same
-* `link_data_rate_bit_per_ns` : Data rate set for all links (bit/ns = Gbit/s)
 
 **schedule.csv**
 
@@ -49,7 +48,17 @@ Notes: connection_id must increment each line. All values except additional_para
 
 **topology.properties**
 
-The topological layout of the network. Please see the examples to understand each property. Besides it just defining a graph, the following rules apply:
+The topological layout of the network. The following properties must be defined:
+
+* `num_nodes` : Number of nodes
+* `num_undirected_edges` : Number of undirected edges (= links)
+* `switches` : All node identifiers which are switches expressed as `set(a, b, c)`, e.g.: `set(5, 6)` means node 5 and 7 are switches
+* `switches_which_are_tors` : All node identifiers which are also ToRs expressed as `set(a, b, c)`
+* `servers` : All node identifiers which are servers expressed as `set(a, b, c)`
+* `undirected_edges` : All undirected edges, expressed as `set(a-b, b-c)`, e.g.: `set(0-2, 2-3)` means two links, between 0 and 2, and between 2 and 3
+* `link_data_rate_bit_per_ns` : Data rate set for all links (bit/ns = Gbit/s) (expressed as a number `double`, e.g.: `4.5` means 4.5 Gbit/s)
+
+ Please see the examples to understand each property. Besides it just defining a graph, the following rules apply:
 
 * If there are servers defined, they can only have edges to a ToR.
 * There is only a semantic difference between switches, switches which are ToRs and servers. If there are servers, only servers should be valid endpoints for applications. If there are no servers, ToRs should be valid endpoints instead.

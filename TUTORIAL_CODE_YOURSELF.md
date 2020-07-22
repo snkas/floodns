@@ -10,7 +10,7 @@
    <dependency>
        <groupId>ch.ethz.systems</groupId>
        <artifactId>floodns</artifactId>
-       <version>3.3.0</version>
+       <version>3.4.0</version>
    </dependency>
    ```
 
@@ -40,8 +40,7 @@
     
             // Fat-tree topology
             Topology topology = FileToTopologyConverter.convert(
-                    "test_data/1_to_1.properties",
-                    10 // 10 flow units / time unit ("bit/ns")
+                    "test_data/1_to_1_capacity_10.properties" // 10 flow units / time unit ("bit/ns")
             );
             Network network = topology.getNetwork();
     

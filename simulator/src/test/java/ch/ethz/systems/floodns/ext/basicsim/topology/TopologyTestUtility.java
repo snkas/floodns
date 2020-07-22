@@ -75,10 +75,10 @@ public class TopologyTestUtility {
     ) throws IOException {
 
         // Create topology file
-        File tempTopology = constructTopologyFile(numNodes, numUndirectedEdges, servers, switches, switchesWhichAreTors, undirectedEdges);
+        File tempTopology = constructTopologyFile(numNodes, numUndirectedEdges, servers, switches, switchesWhichAreTors, undirectedEdges, String.valueOf(linkCapacityUniform));
 
         // Create topology
-        Topology res = FileToTopologyConverter.convert(tempTopology.getAbsolutePath(), linkCapacityUniform);
+        Topology res = FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
 
         // Clean-up of file
         assertTrue(tempTopology.delete());
@@ -96,18 +96,20 @@ public class TopologyTestUtility {
      * @param switches              Switches parameter value
      * @param switchesWhichAreTors  ToRs parameter value
      * @param undirectedEdges       Undirected edges
+     * @param linkDataRateBitPerNs  Link data rate
      *
      * @return  Topology
      *
      * @throws IOException  Thrown iff temporary file I/O failed
      */
-    private static File constructTopologyFile(
+    public static File constructTopologyFile(
             int numNodes,
             int numUndirectedEdges,
             String servers,
             String switches,
             String switchesWhichAreTors,
-            String undirectedEdges
+            String undirectedEdges,
+            String linkDataRateBitPerNs
     ) throws IOException {
 
 
@@ -122,7 +124,8 @@ public class TopologyTestUtility {
         topologyWriter.write("servers=" + servers + "\n");
         topologyWriter.write("switches=" + switches + "\n");
         topologyWriter.write("switches_which_are_tors=" + switchesWhichAreTors + "\n");
-        topologyWriter.write("undirected_edges=" + undirectedEdges);
+        topologyWriter.write("undirected_edges=" + undirectedEdges + "\n");
+        topologyWriter.write("link_data_rate_bit_per_ns=" + linkDataRateBitPerNs + "\n");
         topologyWriter.close();
 
         // Return temporary topology file

@@ -26,6 +26,7 @@ package ch.ethz.systems.floodns.ext.basicsim.topology;
 
 import ch.ethz.systems.floodns.core.Network;
 import ch.ethz.systems.floodns.ext.basicsim.NoDuplicatesProperties;
+import ch.ethz.systems.floodns.ext.utils.ConstantMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -40,18 +41,6 @@ import java.util.*;
 public class FileToTopologyConverter {
 
     /**
-     * Convert a file to an instantiated topology.
-     *
-     * @param fileName              File name
-     * @param uniformLinkCapacity   Uniform link capacity
-     *
-     * @return  Topology
-     */
-    public static Topology convert(String fileName, double uniformLinkCapacity) {
-        return convert(fileName, new UniformLinkCapacityAssigner(uniformLinkCapacity));
-    }
-
-    /**
      * Read in a graph and its details.
      *
      * Properties with the following properties for example:
@@ -62,13 +51,13 @@ public class FileToTopologyConverter {
      * switches_which_are_tors=set(0,1,2)
      * servers=set()
      * undirected_edges=set(0-1,1-2,0-2)
+     * link_data_rate_bit_per_ns=map(0-1:10, 1-2:10, 0-2:10)
      *
      * @param fileName              File name (e.g. /path/to/file.topology)
-     * @param linkCapacityAssigner  Link capacity assigner
      *
      * @return Graph and its details
      */
-    public static Topology convert(String fileName, LinkCapacityAssigner linkCapacityAssigner) {
+    public static Topology convert(String fileName) {
 
         try {
 
@@ -79,7 +68,7 @@ public class FileToTopologyConverter {
 
             // Check required properties
             properties.validate(new String[]{
-                    "num_nodes", "num_undirected_edges", "switches", "servers", "switches_which_are_tors", "undirected_edges"
+                    "num_nodes", "num_undirected_edges", "switches", "servers", "switches_which_are_tors", "undirected_edges", "link_data_rate_bit_per_ns"
             });
 
             // Set it within the details
@@ -118,6 +107,7 @@ public class FileToTopologyConverter {
             // Instantiate network
             Network network = new Network(details.getNumNodes());
             List<Pair<Integer, Integer>> edgeList = edgeSetToSortedAscendingEdgeList(convertToSetOfUndirectedEdgePairs(properties.getProperty("undirected_edges")));
+            Map<Pair<Integer, Integer>, Double> linkToCapacity = convertToLinkCapacityMap(edgeList, properties.getProperty("link_data_rate_bit_per_ns"));
             for (Pair<Integer, Integer> pair : edgeList) {
                 int from = pair.getLeft();
                 int to = pair.getRight();
@@ -142,8 +132,8 @@ public class FileToTopologyConverter {
                 }
 
                 // Add to network
-                network.addLink(from, to, linkCapacityAssigner.assignCapacity(details, from, to));
-                network.addLink(to, from, linkCapacityAssigner.assignCapacity(details, to, from));
+                network.addLink(from, to, linkToCapacity.get(pair));
+                network.addLink(to, from, linkToCapacity.get(pair));
 
             }
 
@@ -154,13 +144,6 @@ public class FileToTopologyConverter {
                         details.getNumUndirectedEdges() * 2,
                         network.getPresentLinks().size()
                 ));
-            }
-
-            // Servers can only have one ToR connected to it
-            for (int i : details.getServerNodeIds()) {
-                if (network.getOutgoingLinksOf(i).size() != 1) {
-                    throw new IllegalArgumentException("Server with id " + i + " is connect to zero or more than one ToR.");
-                }
             }
 
             // Return final instantiated network
@@ -213,10 +196,13 @@ public class FileToTopologyConverter {
             }
             int a = parsePositiveInteger(spl[0]);
             int b = parsePositiveInteger(spl[1]);
-            setPairsSet.add(new ImmutablePair<>(Math.min(a, b), Math.max(b, a)));
+            if (b < a) {
+                throw new IllegalArgumentException("The first node identifier should be the lower one: " + s);
+            }
+            setPairsSet.add(new ImmutablePair<>(a, b));
         }
         if (stringSet.size() != setPairsSet.size()) {
-            throw new IllegalArgumentException("Duplicate undirected edge pair in set.");
+            throw new IllegalArgumentException("Duplicate undirected edge pair in set");
         }
         return setPairsSet;
     }
@@ -233,6 +219,71 @@ public class FileToTopologyConverter {
             throw new IllegalArgumentException("Value must be a positive integer: " + s);
         }
         return value;
+    }
+
+    private static double parsePositiveDouble(String s) {
+        double value = Double.parseDouble(s);
+        if (value < 0.0) {
+            throw new IllegalArgumentException("Value must be a positive double: " + s);
+        }
+        return value;
+    }
+
+    private static Map<Pair<Integer, Integer>, Double> convertToLinkCapacityMap(List<Pair<Integer, Integer>> edgeList, String val) {
+
+        // If it does not start with map, it must be just a single value
+        if (!val.trim().startsWith("map")) {
+            return new ConstantMap<>(parsePositiveDouble(val));
+        }
+
+        // Parse the mapping
+        Map<Pair<Integer, Integer>, Double> result = new HashMap<>();
+        if (val.startsWith("map(") && val.endsWith(")")) {
+            String inner = val.substring(4, val.length() - 1);
+            if (inner.trim().length() > 0) {
+
+                // Split inner on the comma
+                String[] spl = inner.split(",");
+                for (String s : spl) {
+
+                    // a-b:c into (a-b, c)
+                    String[] splColon = s.split(":");
+                    if (splColon.length != 2) {
+                        throw new IllegalArgumentException("Mapping must be a-b:c, incorrect: " + s);
+                    }
+
+                    // a-b into (a, b)
+                    String[] dashSplit = splColon[0].split("-");
+                    if (dashSplit.length != 2) {
+                        throw new IllegalArgumentException("Mapping key must be a-b, incorrect: " + splColon[0]);
+                    }
+                    Pair<Integer, Integer> edge = new ImmutablePair<>(parsePositiveInteger(dashSplit[0].trim()), parsePositiveInteger(dashSplit[1].trim()));
+
+                    // (a, b) must be in the topology
+                    if (!edgeList.contains(edge)) {
+                        throw new IllegalArgumentException("Edge does not exist: " + edge);
+                    }
+
+                    // Parse capacity value
+                    double capacity = parsePositiveDouble(splColon[1].trim());
+                    if (result.containsKey(edge)) {
+                        throw new IllegalArgumentException("Duplicate in link to capacity mapping: " + edge);
+                    }
+                    result.put(edge, capacity);
+
+                }
+            }
+
+            // Check all edges are in the mapping
+            if (result.size() != edgeList.size()) {
+                throw new IllegalArgumentException("Not all edges were covered");
+            }
+
+        } else {
+            throw new IllegalArgumentException("Value must be a single value or map(...): " + val);
+        }
+
+        return result;
     }
 
 }

@@ -102,7 +102,7 @@ public class NetworkAllocatorTest {
     @Test
     public void testUselessAllocator() throws IOException {
         Simulator simulator = new Simulator();
-        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_2_to_7.properties", 10);
+        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_2_to_7.properties");
         Network network = topology.getNetwork();
 
         Aftermath allocator = new Aftermath(simulator, network) {

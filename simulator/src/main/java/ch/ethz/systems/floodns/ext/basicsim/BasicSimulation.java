@@ -64,8 +64,8 @@ public class BasicSimulation {
             config.load(fileInputStream);
             fileInputStream.close();
             config.validate(new String[]{
-                    "filename_topology", "filename_schedule", "simulation_end_time_ns",
-                    "simulation_seed", "link_data_rate_bit_per_ns"
+                    "filename_topology", "filename_schedule",
+                    "simulation_end_time_ns", "simulation_seed"
             });
 
             // Base simulation properties
@@ -75,8 +75,7 @@ public class BasicSimulation {
 
             // Topology
             Topology topology = FileToTopologyConverter.convert(
-                    runDirectory + "/" + config.getStringOrFail("filename_topology"),
-                    config.getPositiveDoubleOrFail("link_data_rate_bit_per_ns")
+                    runDirectory + "/" + config.getStringOrFail("filename_topology")
             );
             Network network = topology.getNetwork();
 

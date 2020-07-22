@@ -88,7 +88,7 @@ public class SimulatorDisabledEventsTest {
         Simulator simulator = new Simulator();
 
         // 0 -- 1
-        Topology topology = FileToTopologyConverter.convert("test_data/1_to_1.properties", 10);
+        Topology topology = FileToTopologyConverter.convert("test_data/1_to_1_capacity_10.properties");
         Network network = topology.getNetwork();
 
         // Traffic schedule
@@ -132,7 +132,7 @@ public class SimulatorDisabledEventsTest {
         Simulator simulator = new Simulator();
 
         // 0 -- 1
-        Topology topology = FileToTopologyConverter.convert("test_data/1_to_1.properties", 10);
+        Topology topology = FileToTopologyConverter.convert("test_data/1_to_1_capacity_10.properties");
         Network network = topology.getNetwork();
 
         // Traffic schedule

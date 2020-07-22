@@ -52,7 +52,7 @@ public class UniformFixedAllocatorTest {
         Simulator simulator = new Simulator();
 
         // Create new network, simulator and allocator
-        Topology topology = FileToTopologyConverter.convert("test_data/1_to_1.properties", 9.0);
+        Topology topology = FileToTopologyConverter.convert("test_data/1_to_1_capacity_9.properties");
         Network network = topology.getNetwork();
 
         Aftermath allocator = new UniformFixedAllocator(simulator, network, 0.91);

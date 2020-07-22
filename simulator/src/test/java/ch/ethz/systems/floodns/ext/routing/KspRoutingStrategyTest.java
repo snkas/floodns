@@ -55,7 +55,7 @@ public class KspRoutingStrategyTest {
                 "set()",
                 "set(0, 1, 2, 3, 4, 5)",
                 "set(0, 1, 3)",
-                "set(0-1,1-3,2-3,0-2,0-4,1-4,2-4,3-4,1-5,5-3)",
+                "set(0-1,1-3,2-3,0-2,0-4,1-4,2-4,3-4,1-5,3-5)",
                 6
         );
         Simulator simulator = new Simulator();
@@ -113,7 +113,7 @@ public class KspRoutingStrategyTest {
                 "set(6,7,8,9,10,11)",
                 "set(0, 1, 2, 3, 4, 5)",
                 "set(0, 1, 3)",
-                "set(0-1,1-3,2-3,0-2,0-4,1-4,2-4,3-4,1-5,5-3,0-6,0-7,1-8,1-9,10-3,3-11)",
+                "set(0-1,1-3,2-3,0-2,0-4,1-4,2-4,3-4,1-5,3-5,0-6,0-7,1-8,1-9,3-10,3-11)",
                 55
         );
         Simulator simulator = new Simulator();
@@ -172,7 +172,7 @@ public class KspRoutingStrategyTest {
                 "set()",
                 "set(0, 1, 2, 3, 4, 5)",
                 "set(0, 1, 3)",
-                "set(0-1,1-3,2-3,0-2,0-4,1-4,2-4,3-4,1-5,5-3)",
+                "set(0-1,1-3,2-3,0-2,0-4,1-4,2-4,3-4,1-5,3-5)",
                 6
         );
         Simulator simulator = new Simulator();

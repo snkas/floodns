@@ -51,7 +51,6 @@ public class BasicSimulationTest {
         writerConfig.write("filename_schedule=\"schedule.csv\"\n");
         writerConfig.write("simulation_end_time_ns=5000000000\n");
         writerConfig.write("simulation_seed=123456789\n");
-        writerConfig.write("link_data_rate_bit_per_ns=0.1\n");
         writerConfig.close();
 
         // topology.properties
@@ -62,6 +61,7 @@ public class BasicSimulationTest {
         writerTopology.write("switches_which_are_tors=set(0,1,2,3)\n");
         writerTopology.write("servers=set()\n");
         writerTopology.write("undirected_edges=set(0-1,0-2,1-3,2-3)\n");
+        writerTopology.write("link_data_rate_bit_per_ns=0.1\n");
         writerTopology.close();
 
         // schedule.csv

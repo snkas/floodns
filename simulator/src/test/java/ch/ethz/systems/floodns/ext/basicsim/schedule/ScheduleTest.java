@@ -27,10 +27,13 @@ package ch.ethz.systems.floodns.ext.basicsim.schedule;
 import ch.ethz.systems.floodns.core.Connection;
 import ch.ethz.systems.floodns.core.Event;
 import ch.ethz.systems.floodns.core.Simulator;
+import ch.ethz.systems.floodns.ext.basicsim.topology.FileToTopologyConverter;
 import ch.ethz.systems.floodns.ext.basicsim.topology.Topology;
 import ch.ethz.systems.floodns.ext.metadata.SimpleStringMetadata;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -60,7 +63,7 @@ public class ScheduleTest {
                 "set(6,7,8,9,10,11)",
                 "set(0, 1, 2, 3, 4, 5)",
                 "set(0, 1, 3)",
-                "set(0-1,1-3,2-3,0-2,0-4,1-4,2-4,3-4,1-5,5-3,0-6,0-7,1-8,1-9,10-3,3-11)",
+                "set(0-1,1-3,2-3,0-2,0-4,1-4,2-4,3-4,1-5,3-5,0-6,0-7,1-8,1-9,3-10,3-11)",
                 55
         );
 
@@ -152,7 +155,7 @@ public class ScheduleTest {
                 "set(6,7,8,9,10,11)",
                 "set(0, 1, 2, 3, 4, 5)",
                 "set(0, 1, 3)",
-                "set(0-1,1-3,2-3,0-2,0-4,1-4,2-4,3-4,1-5,5-3,0-6,0-7,1-8,1-9,10-3,3-11)",
+                "set(0-1,1-3,2-3,0-2,0-4,1-4,2-4,3-4,1-5,3-5,0-6,0-7,1-8,1-9,3-10,3-11)",
                 55
         );
         boolean thrown;
@@ -250,6 +253,19 @@ public class ScheduleTest {
             thrown = true;
         }
         assertTrue(thrown);
+
+        // Schedule file does not exist
+        // Create a file which is deleted afterwards, such that it does not exist
+        File tempFile = File.createTempFile("schedule", ".csv");
+        Assert.assertTrue(tempFile.delete());
+
+        thrown = false;
+        try {
+            new Schedule(tempFile.getAbsolutePath(), topology, 385298955L);
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        Assert.assertTrue(thrown);
 
     }
 

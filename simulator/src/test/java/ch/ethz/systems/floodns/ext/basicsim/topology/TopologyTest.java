@@ -124,15 +124,27 @@ public class TopologyTest {
         assertTrue(thrown);
 
         // Server to two ToRs
+        // Now permitted, so allowed
+        TopologyTestUtility.constructTopology(
+                5,
+                5,
+                "set(0, 4)",
+                "set(1, 2, 3)",
+                "set(1, 3)",
+                "set(0-1,1-2,2-3,3-4,0-3)",
+                10
+        );
+
+        // Switch is not a ToR
         thrown = false;
         try {
             TopologyTestUtility.constructTopology(
                     5,
                     5,
-                    "set(0, 4)",
-                    "set(1, 2, 3)",
-                    "set(1, 3)",
-                    "set(0-1,1-2,2-3,3-4,0-3)",
+                    "set(3, 4)",
+                    "set(0, 1, 2)",
+                    "set(0, 2)",
+                    "set(0-1,1-2,0-3,1-4)", // 1-4 is invalid
                     10
             );
         } catch (IllegalArgumentException e) {
@@ -168,6 +180,23 @@ public class TopologyTest {
                     "set(1, 3)",
                     "set(0-1,1-2,2-3,3-4,4-2)",
                     10
+            );
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Edge duplicate
+        thrown = false;
+        try {
+            TopologyTestUtility.constructTopology(
+                    5,
+                    4,
+                    "set(0, 4)",
+                    "set(1, 2, 3)",
+                    "set(1, 3)",
+                    "set(1-2,2-3,0-1,3-4,03-4)",
+                    34.23
             );
         } catch (IllegalArgumentException e) {
             thrown = true;

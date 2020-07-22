@@ -345,17 +345,6 @@ public class Network {
     }
 
     /**
-     * Retrieve the set of outgoing links of a node.
-     *
-     * @param nodeId    Node identifier (0 &lt;= nodeId &lt; n)
-     *
-     * @return Unmodifiable set of outgoing links
-     */
-    public Set<Link> getOutgoingLinksOf(int nodeId) {
-        return getNode(nodeId).getOutgoingLinks();
-    }
-
-    /**
      * Set the path of the flow through the network.
      *
      * Runtime is O(|old_path| + |new_path|).

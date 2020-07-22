@@ -55,7 +55,7 @@ public class SimulatorBasicTest {
     @Test
     public void testEnsureSimulatorGetComponents() {
         Simulator simulator = new Simulator();
-        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties", 10);
+        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties");
         final Network network = topology.getNetwork();
         Aftermath allocator = new VoidAllocator(simulator, network);
         LoggerFactory loggerFactory = new VoidLoggerFactory(simulator);
@@ -71,7 +71,7 @@ public class SimulatorBasicTest {
         // Setup
         Simulator simulator = new Simulator();
         Simulator simulatorB = new Simulator();
-        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties", 10);
+        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties");
         final Network network = topology.getNetwork();
         Aftermath allocator = new VoidAllocator(simulator, network);
         Aftermath allocatorB = new VoidAllocator(simulatorB, network);
@@ -106,7 +106,7 @@ public class SimulatorBasicTest {
         // <fully connected>
         // 0   1   2   3   4
         //
-        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties", 10);
+        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties");
         Network network = topology.getNetwork();
 
         // Traffic schedule
@@ -148,7 +148,7 @@ public class SimulatorBasicTest {
         // <fully connected>
         // 0   1   2   3   4
         //
-        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties", 10);
+        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties");
         Network network = topology.getNetwork();
 
         // Traffic schedule
@@ -177,7 +177,7 @@ public class SimulatorBasicTest {
         // <fully connected>
         // 0   1   2   3   4
         //
-        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties", 10);
+        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties");
         Network network = topology.getNetwork();
 
         // Very basic route decider
@@ -360,7 +360,7 @@ public class SimulatorBasicTest {
         // <fully connected>
         // 0   1   2   3   4
         //
-        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties", 10);
+        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties");
         final Network network = topology.getNetwork();
 
         // Setup

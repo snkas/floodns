@@ -26,13 +26,13 @@ package ch.ethz.systems.floodns.ext.basicsim.topology;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 
 import static ch.ethz.systems.floodns.ext.basicsim.topology.TopologyTestUtility.constructTopology;
 import static ch.ethz.systems.floodns.ext.basicsim.topology.TopologyTestUtility.createSet;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class FileToTopologyConverterTest {
 
@@ -48,7 +48,7 @@ public class FileToTopologyConverterTest {
                 "set(4, 5, 6)",
                 "set(0, 1, 2, 3)",
                 "set(1, 3)",
-                "set(0-1,1-2,2-3,3-4,5-1,6-1)",
+                "set(0-1,1-2,2-3,3-4,1-5,1-6)",
                 10.0
         );
 
@@ -73,6 +73,346 @@ public class FileToTopologyConverterTest {
         exp2.add(4);
         assertEquals(details.getServersOfTor(3), exp2);
         assertEquals(details.getTorIdOfServer(4), 3);
+
+    }
+
+    @Test
+    public void testInvalidServerToSwitch() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                4,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(0-5, 1-3, 2-4, 3-4)",
+                ""
+        );
+
+        boolean thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testNormalLinkDataRateMap() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                4,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(0-2, 1-3, 2-4, 3-4)",
+                "map(0-2: 10, 1-3: 5, 2-4: 10, 3-4: 8)"
+        );
+
+        // Check topology is created properly
+        Topology topology = FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        assertEquals(topology.getNetwork().getPresentLinksBetween(0, 2).get(0).getCapacity(), 10.0, 0.000001);
+        assertEquals(topology.getNetwork().getPresentLinksBetween(1, 3).get(0).getCapacity(), 5, 0.000001);
+        assertEquals(topology.getNetwork().getPresentLinksBetween(2, 4).get(0).getCapacity(), 10.0, 0.000001);
+        assertEquals(topology.getNetwork().getPresentLinksBetween(3, 4).get(0).getCapacity(), 8.0, 0.000001);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testEmptyLinkDataRateMap() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                0,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set()",
+                "map()"
+        );
+
+        // Check topology is created properly
+        FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testColonMissingMap() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                1,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(2-3)",
+                "map(2-3 10.0)"
+        );
+
+        boolean thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testDashMissingMap() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                1,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(2-3)",
+                "map(2 3:10.0)"
+        );
+
+        boolean thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testInvalidEdgeMap() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                1,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(2-3)",
+                "map(2-3:9,2-4:10.0)"
+        );
+
+        boolean thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testDuplicateEdgeMap() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                1,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(2-3)",
+                "map(2-3:6.0,2-3:6.0)"
+        );
+
+        boolean thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testMissingEdgeMap() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                2,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(2-3,3-4)",
+                "map(2-3:6.0)"
+        );
+
+        boolean thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testBadCapacity() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                1,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(2-3)",
+                "map(2-3:xyz)"
+        );
+
+        boolean thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testNegativeCapacity() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                1,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(2-3)",
+                "map(2-3:-5)"
+        );
+
+        boolean thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+    }
+
+    @Test
+    public void testNonExistentFile() throws IOException {
+
+        // Create a file which is deleted afterwards, such that it does not exist
+        File tempFile = File.createTempFile("topology", ".tmp");
+        assertTrue(tempFile.delete());
+
+        boolean thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempFile.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+
+    }
+
+    @Test
+    public void testDistortedMapCapacity() throws IOException {
+
+        File tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                1,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(2-3)",
+                "map(2-3:10"
+        );
+
+        boolean thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+        tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                1,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(2-3)",
+                "map2-3:10)"
+        );
+
+        thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
+
+        tempTopology = TopologyTestUtility.constructTopologyFile(
+                5,
+                1,
+                "set(0, 1)",
+                "set(2, 3, 4)",
+                "set(2, 3)",
+                "set(2-3)",
+                "map(2-3:10))"
+        );
+
+        thrown = false;
+        try {
+            FileToTopologyConverter.convert(tempTopology.getAbsolutePath());
+        } catch (IllegalArgumentException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
+
+        // Clean-up of file
+        assertTrue(tempTopology.delete());
 
     }
 

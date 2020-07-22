@@ -153,8 +153,7 @@ public class YenTopKAlgorithmTest {
 
         // Generate network
         Topology topology = FileToTopologyConverter.convert(
-                "test_data/fat_tree_k" + kFatTree + "" + apx + ".properties",
-                10.0
+                "test_data/fat_tree_k" + kFatTree + "" + apx + ".properties"
         );
         Network network = topology.getNetwork();
 

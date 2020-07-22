@@ -60,7 +60,7 @@ public class SimulatorIllegalTest {
         // <fully connected>
         // 0   1   2   3   4
         //
-        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties", 10);
+        Topology topology = FileToTopologyConverter.convert("test_data/tiny_clos_5_to_3.properties");
         final Network network = topology.getNetwork();
 
         // Setup
