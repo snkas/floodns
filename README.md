@@ -14,7 +14,7 @@ As a consequence, simulating large flows is generally quicker because the runtim
 
 * Java 7 or higher (check: `java -version`)
 * Maven 3 or higher (check: `mvn --version`)
-* Python 3.5 or higher (check: `python --version`)
+* Python 3.7 or higher (check: `python --version`)
 * Gnuplot 4.4 or higher (check: `gnuplot --version`)
 * OR-tools and ortoolslpparser to solve linear programs from file:
 

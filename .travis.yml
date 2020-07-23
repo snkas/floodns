@@ -3,10 +3,11 @@ os: linux
 dist: bionic
 
 # Command to install dependencies
-before_install: pyenv global 3.6
+before_install: pyenv global 3.7
 install:
   - pip install ortools
   - pip install git+https://github.com/snkas/python-ortools-lp-parser
+  - pip install git+https://github.com/snkas/exputilpy
 
 # Command to run tests
 before_script: cd quick
