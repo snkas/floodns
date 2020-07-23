@@ -72,13 +72,33 @@ Notes: connection_id must increment each line. All values except additional_para
 
 The topological layout of the network. The following properties must be defined:
 
-* `num_nodes` : Number of nodes
-* `num_undirected_edges` : Number of undirected edges (= links)
-* `switches` : All node identifiers which are switches expressed as `set(a, b, c)`, e.g.: `set(5, 6)` means node 5 and 7 are switches
-* `switches_which_are_tors` : All node identifiers which are also ToRs expressed as `set(a, b, c)`
-* `servers` : All node identifiers which are servers expressed as `set(a, b, c)`
-* `undirected_edges` : All undirected edges, expressed as `set(a-b, b-c)`, e.g.: `set(0-2, 2-3)` means two links, between 0 and 2, and between 2 and 3
-* `link_data_rate_bit_per_ns` : One undirected edge is translated into two links. Data rate set for all links (bit/ns = Gbit/s) (expressed as a number `double`, e.g.: `4.5` means 4.5 Gbit/s if you want the same rate for all links, else you express it as `map(a->b: c, d->e: f)`, e.g.: `map(0->1: 10.0, 1->0: 8.4)` link 0->1 has 10.0 Gbit/s and link 1->0 has 8.4 Gbit/s capacity. If you choose to express as a map, you have to give it individually for every link.)
+* `num_nodes` (type: positive integer)
+
+  Number of nodes.
+  
+* `num_undirected_edges` (type: positive integer)
+
+  Number of undirected edges (each undirected edge will be expressed into two links).
+
+* `switches` (type: set of node identifiers)
+
+  All node identifiers which are switches expressed as `set(a, b, c)`, e.g.: `set(5, 6)` means node 5 and 7 are switches.
+  
+* `switches_which_are_tors` (type: set of node identifiers)
+
+  All node identifiers which are also ToRs expressed as `set(a, b, c)` (type: set of node identifiers).
+  
+* `servers` (type: set of node identifiers)
+
+  All node identifiers which are servers expressed as `set(a, b, c)`.
+  
+* `undirected_edges` (type: set of undirected edges)
+
+  All undirected edges, expressed as `set(a-b, b-c)`, e.g.: `set(0-2, 2-3)` means two undirected edges, between 0 and 2, and between 2 and 3.
+  
+* `link_data_rate_bit_per_ns` (type: double (global value) or mapping of directed edge (link) to double)
+
+  One undirected edge is translated into two links. Data rate set for all links (bit/ns = Gbit/s) (expressed as a number `double`, e.g.: `4.5` means 4.5 Gbit/s if you want the same rate for all links, else you express it as `map(a->b: c, d->e: f)`, e.g.: `map(0->1: 10.0, 1->0: 8.4)` link 0->1 has 10.0 Gbit/s and link 1->0 has 8.4 Gbit/s capacity. If you choose to express as a map, you have to give it individually for every link.)
 
 Please see the examples to understand each property. Besides it just defining a graph, the following rules apply:
 
