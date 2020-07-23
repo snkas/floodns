@@ -40,6 +40,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -272,10 +273,16 @@ public class FullLogEqualityTest {
         FileLoggerFactory fileLoggerFactory = new FileLoggerFactory(simulator,
                 Files.createTempDirectory("temp_run_dir").toAbsolutePath().toString());
 
+        // Check finished.txt for "No"
+        assertEquals("No", new String(Files.readAllBytes(Paths.get(fileLoggerFactory.completePath(FileLoggerFactory.FILE_NAME_RUN_FINISHED)))));
+
         // Setup and run simulator
         simulator.setup(network, allocator, fileLoggerFactory);
         simulator.insertEvents(trafficSchedule.getConnectionStartEvents());
         simulator.run(72975);
+
+        // Check finished.txt for "Yes"
+        assertEquals("Yes", new String(Files.readAllBytes(Paths.get(fileLoggerFactory.completePath(FileLoggerFactory.FILE_NAME_RUN_FINISHED)))));
 
         // Exact log file equality
         TestLogReader testLogReader = new TestLogReader(fileLoggerFactory);

@@ -32,7 +32,7 @@ def analyze_flow_info(logs_floodns_dir, analysis_folder_dir):
 
     # Read in all the columns
     flows_info_csv_columns = exputil.read_csv_direct_in_columns(
-        logs_floodns_dir + '/flow_info.csv.log',
+        logs_floodns_dir + '/flow_info.csv',
         "pos_int,pos_int,pos_int,string,pos_int,pos_int,pos_int,pos_float,pos_float,string"
     )
     flow_id_list = flows_info_csv_columns[0]
@@ -91,7 +91,7 @@ def analyze_connection_info(logs_floodns_dir, analysis_folder_dir):
 
     # Read in all the columns
     flows_info_csv_columns = exputil.read_csv_direct_in_columns(
-        logs_floodns_dir + '/connection_info.csv.log',
+        logs_floodns_dir + '/connection_info.csv',
         "pos_int,pos_int,pos_int,pos_float,pos_float,string,pos_int,pos_int,pos_int,pos_float,string,string"
     )
     connection_id_list = flows_info_csv_columns[0]
@@ -187,7 +187,7 @@ def analyze_link_info(logs_floodns_dir, analysis_folder_dir):
 
     # Read in all the columns
     link_info_csv_columns = exputil.read_csv_direct_in_columns(
-        logs_floodns_dir + '/link_info.csv.log',
+        logs_floodns_dir + '/link_info.csv',
         "pos_int,pos_int,pos_int,pos_int,pos_int,pos_int,pos_float,pos_float,string"
     )
     link_id_list = link_info_csv_columns[0]
@@ -247,7 +247,7 @@ def analyze_node_info(logs_floodns_dir, analysis_folder_dir):
 
     # Read in all the columns
     link_info_csv_columns = exputil.read_csv_direct_in_columns(
-        logs_floodns_dir + '/node_info.csv.log',
+        logs_floodns_dir + '/node_info.csv',
         "pos_int,pos_float,string"
     )
     node_id_list = link_info_csv_columns[0]

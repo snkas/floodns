@@ -48,25 +48,24 @@ public class FileLoggerFactory extends LoggerFactory {
     private final BufferedWriter writerConnectionBandwidthFile;
     private final BufferedWriter writerFlowInfoFile;
     private final BufferedWriter writerConnectionInfoFile;
-    private final BufferedWriter writerRunFinishedFile;
 
     // Log file names
-    public final static String FILE_NAME_LINK_INFO = "link_info.csv.log";
-    public final static String FILE_NAME_LINK_UTILIZATION = "link_utilization.csv.log";
-    public final static String FILE_NAME_LINK_NUM_ACTIVE_FLOWS = "link_num_active_flows.csv.log";
-    public final static String FILE_NAME_NODE_INFO = "node_info.csv.log";
-    public final static String FILE_NAME_NODE_NUM_ACTIVE_FLOWS = "node_num_active_flows.csv.log";
-    public final static String FILE_NAME_FLOW_INFO = "flow_info.csv.log";
-    public final static String FILE_NAME_FLOW_BANDWIDTH = "flow_bandwidth.csv.log";
-    public final static String FILE_NAME_CONNECTION_INFO = "connection_info.csv.log";
-    public final static String FILE_NAME_CONNECTION_BANDWIDTH = "connection_bandwidth.csv.log";
-    private final static String FILE_NAME_RUN_FINISHED = "run_finished.txt";
+    public final static String FILE_NAME_LINK_INFO = "link_info.csv";
+    public final static String FILE_NAME_LINK_UTILIZATION = "link_utilization.csv";
+    public final static String FILE_NAME_LINK_NUM_ACTIVE_FLOWS = "link_num_active_flows.csv";
+    public final static String FILE_NAME_NODE_INFO = "node_info.csv";
+    public final static String FILE_NAME_NODE_NUM_ACTIVE_FLOWS = "node_num_active_flows.csv";
+    public final static String FILE_NAME_FLOW_INFO = "flow_info.csv";
+    public final static String FILE_NAME_FLOW_BANDWIDTH = "flow_bandwidth.csv";
+    public final static String FILE_NAME_CONNECTION_INFO = "connection_info.csv";
+    public final static String FILE_NAME_CONNECTION_BANDWIDTH = "connection_bandwidth.csv";
+    public final static String FILE_NAME_RUN_FINISHED = "run_finished.txt";
 
     /**
      * Constructor for file logger factory.
      * Automatically opens all the writing streams.
      *
-     * Close once finished using {@link #close()}.
+     * Closed once finished using {@link #close()} by the simulator.
      *
      * @param simulator         Simulator instance
      * @param logFolderPath     Log folder path (e.g. /mnt/user/my/log/folder)
@@ -92,7 +91,9 @@ public class FileLoggerFactory extends LoggerFactory {
             this.writerFlowBandwidthFile = new BufferedWriter(new FileWriter(logFolderPath + "/" + FILE_NAME_FLOW_BANDWIDTH));
             this.writerConnectionInfoFile = new BufferedWriter(new FileWriter(logFolderPath + "/" + FILE_NAME_CONNECTION_INFO));
             this.writerConnectionBandwidthFile = new BufferedWriter(new FileWriter(logFolderPath + "/" + FILE_NAME_CONNECTION_BANDWIDTH));
-            this.writerRunFinishedFile = new BufferedWriter(new FileWriter(logFolderPath + "/" + FILE_NAME_RUN_FINISHED));
+            BufferedWriter writerRunFinishedFile = new BufferedWriter(new FileWriter(logFolderPath + "/" + FILE_NAME_RUN_FINISHED));
+            writerRunFinishedFile.write("No");
+            writerRunFinishedFile.close();
         } catch (IOException e) {
             throw new FatalLogFileException(e);
         }
@@ -150,7 +151,7 @@ public class FileLoggerFactory extends LoggerFactory {
     }
 
     @Override
-    public void close() {
+    protected void close() {
 
         try {
             writerLinkInfoFile.close();
@@ -162,7 +163,8 @@ public class FileLoggerFactory extends LoggerFactory {
             writerConnectionBandwidthFile.close();
             writerFlowInfoFile.close();
             writerConnectionInfoFile.close();
-            writerRunFinishedFile.write("YES");
+            BufferedWriter writerRunFinishedFile = new BufferedWriter(new FileWriter(logFolderPath + "/" + FILE_NAME_RUN_FINISHED));
+            writerRunFinishedFile.write("Yes");
             writerRunFinishedFile.close();
         } catch (IOException e) {
             throw new FatalLogFileException(e);
@@ -173,67 +175,12 @@ public class FileLoggerFactory extends LoggerFactory {
     /**
      * Retrieve absolute path of log file.
      *
-     * @param logFileName   Log file name (e.g. "temp.csv.log")
+     * @param logFileName   Log file name (e.g. "temp.csv")
      *
-     * @return Complete path (e.g. "C:/folder/temp.csv.log")
+     * @return Complete path (e.g. "C:/folder/temp.csv")
      */
     public String completePath(String logFileName) {
         return logFolderPath + "/" + logFileName;
-    }
-
-    /**
-     * Run a specific command on the running folder, e.g. to analyze
-     * the running data. The command is called as follows:
-     *
-     * <i>command</i> /path/to/run/folder
-     *
-     * @param command   Command (e.g. python analysis/analyze.py)
-     */
-    public void runCommandOnLogFolder(String command) {
-
-        // Logging must to file in order to run a command on the run folder
-        if (logFolderPath == null) {
-            throw new UnsupportedOperationException("Cannot perform command on run folder if logging is not done to file.");
-        }
-
-        // Formulate the full command
-        String fullCommand = command + " " + logFolderPath;
-
-        Process p;
-        try {
-
-            logger.info("Executing command '" + fullCommand + "'...");
-
-            // Start process
-            p = Runtime.getRuntime().exec(fullCommand);
-
-            // Fetch input streams
-            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-
-            // Read the output from the command
-            String s;
-            while ((s = stdInput.readLine()) != null) {
-                logger.info(s);
-            }
-
-            // Read any errors from the attempted command
-            while ((s = stdError.readLine()) != null) {
-                logger.error(s);
-            }
-
-            // Wait for the command thread to be ended
-            p.waitFor();
-            p.destroy();
-
-            logger.info("... command has been executed (any output is shown above).");
-
-        } catch (IOException e) {
-            throw new RuntimeException("... command failed (I/O).", e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException("... command failed (interrupted).", e);
-        }
-
     }
 
 }

@@ -83,7 +83,7 @@ public abstract class LoggerFactory {
     public abstract LinkLogger createLinkLogger(Link link);
     public abstract FlowLogger createFlowLogger(Flow flow);
     public abstract ConnectionLogger createConnectionLogger(Connection connection);
-    public abstract void close();
+    protected abstract void close();
 
     public void setConnectionInfoSavingEnabled(boolean enabled) {
         isConnectionInfoSavingEnabled = enabled;

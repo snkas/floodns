@@ -26,8 +26,8 @@ import sys
 
 
 def convert_connection_info_to_human_readable(logs_floodns_dir):
-    with open(logs_floodns_dir + "/connection_info.csv.log", "r") as f_in:
-        with open(logs_floodns_dir + "/connection_info.txt.log", "w+") as f_out:
+    with open(logs_floodns_dir + "/connection_info.csv", "r") as f_in:
+        with open(logs_floodns_dir + "/connection_info.txt", "w+") as f_out:
 
             # Info
             print("Assuming flow unit is in bits, and time unit is in nanoseconds.")
@@ -58,7 +58,7 @@ def convert_connection_info_to_human_readable(logs_floodns_dir):
                 )
 
             # Finished
-            print("Human readable file: " + logs_floodns_dir + "/connection_info.txt.log")
+            print("Human readable file: " + logs_floodns_dir + "/connection_info.txt")
 
 
 def main():

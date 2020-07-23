@@ -163,9 +163,6 @@ public class SimulatorBasicTest {
         simulator.setup(network, new SimpleMmfAllocator(simulator, network), loggerFactory);
         simulator.run(1000);
 
-        // Now run some command on it
-        loggerFactory.runCommandOnLogFolder("echo");
-
     }
 
 
