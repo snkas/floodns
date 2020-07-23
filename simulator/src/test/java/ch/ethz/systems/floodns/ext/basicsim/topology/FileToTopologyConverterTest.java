@@ -86,7 +86,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(0-5, 1-3, 2-4, 3-4)",
-                ""
+                "10.0"
         );
 
         boolean thrown = false;
@@ -112,7 +112,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(0-2, 1-3, 2-4, 3-4)",
-                "map(0-2: 10, 2-0: 9, 1-3: 5, 3-1: 5, 2-4: 10, 4-2: 10, 3-4: 8, 4-3: 4)"
+                "map(0->2: 10, 2->0: 9, 1->3: 5, 3->1: 5, 2->4: 10, 4->2: 10, 3->4: 8, 4->3: 4)"
         );
 
         // Check topology is created properly
@@ -162,7 +162,7 @@ public class FileToTopologyConverterTest {
                 "set(0, 1)",
                 "set(0, 1)",
                 "set(0-1)",
-                "map(0-1: 5, 1-0: 5)"
+                "map(0->1: 5, 1->0: 5)"
         );
 
         // Check topology is created properly
@@ -183,7 +183,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(2-3)",
-                "map(2-3 10.0)"
+                "map(2->3 10.0)"
         );
 
         boolean thrown = false;
@@ -235,7 +235,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(2-3)",
-                "map(2-3:9,2-4:10.0)"
+                "map(2->3:9,2->4:10.0)"
         );
 
         boolean thrown = false;
@@ -261,7 +261,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(2-3)",
-                "map(2-3:6.0,2-3:6.0)"
+                "map(2->3:6.0,2->3:6.0)"
         );
 
         boolean thrown = false;
@@ -287,7 +287,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(2-3,3-4)",
-                "map(2-3:6.0)"
+                "map(2->3:6.0)"
         );
 
         boolean thrown = false;
@@ -313,7 +313,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(2-3)",
-                "map(2-3:xyz)"
+                "map(2->3:xyz)"
         );
 
         boolean thrown = false;
@@ -339,7 +339,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(2-3)",
-                "map(2-3:-5)"
+                "map(2->3:-5)"
         );
 
         boolean thrown = false;
@@ -383,7 +383,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(2-3)",
-                "map(2-3:10"
+                "map(2->3:10"
         );
 
         boolean thrown = false;
@@ -404,7 +404,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(2-3)",
-                "map2-3:10)"
+                "map2->3:10)"
         );
 
         thrown = false;
@@ -425,7 +425,7 @@ public class FileToTopologyConverterTest {
                 "set(2, 3, 4)",
                 "set(2, 3)",
                 "set(2-3)",
-                "map(2-3:10))"
+                "map(2->3:10))"
         );
 
         thrown = false;

@@ -51,7 +51,7 @@ public class FileToTopologyConverter {
      * switches_which_are_tors=set(0,1,2)
      * servers=set()
      * undirected_edges=set(0-1,1-2,0-2)
-     * link_data_rate_bit_per_ns=map(0-1:10, 1-2:10, 0-2:10)
+     * link_data_rate_bit_per_ns=map(0->1:10, 1->2:10, 0->2:10, 1->0:10, 2->1:10, 2->0:10)
      *
      * @param fileName              File name (e.g. /path/to/file.topology)
      *
@@ -249,13 +249,13 @@ public class FileToTopologyConverter {
                     // a-b:c into (a-b, c)
                     String[] splColon = s.split(":");
                     if (splColon.length != 2) {
-                        throw new IllegalArgumentException("Mapping must be a-b:c, incorrect: " + s);
+                        throw new IllegalArgumentException("Mapping must be a->b:c, incorrect: " + s);
                     }
 
-                    // a-b into (a, b)
-                    String[] dashSplit = splColon[0].split("-");
+                    // a->b into (a, b)
+                    String[] dashSplit = splColon[0].split("->");
                     if (dashSplit.length != 2) {
-                        throw new IllegalArgumentException("Mapping key must be a-b, incorrect: " + splColon[0]);
+                        throw new IllegalArgumentException("Mapping key must be a->b, incorrect: " + splColon[0]);
                     }
                     Pair<Integer, Integer> edge = new ImmutablePair<>(parsePositiveInteger(dashSplit[0].trim()), parsePositiveInteger(dashSplit[1].trim()));
 
