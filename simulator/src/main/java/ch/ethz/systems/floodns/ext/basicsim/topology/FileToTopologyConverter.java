@@ -51,7 +51,7 @@ public class FileToTopologyConverter {
      * switches_which_are_tors=set(0,1,2)
      * servers=set()
      * undirected_edges=set(0-1,1-2,0-2)
-     * link_data_rate_bit_per_ns=map(0->1:10, 1->2:10, 0->2:10, 1->0:10, 2->1:10, 2->0:10)
+     * link_data_rate_bit_per_ns=map(0-&gt;1:10, 1-&gt;2:10, 0-&gt;2:10, 1-&gt;0:10, 2-&gt;1:10, 2-&gt;0:10)
      *
      * @param fileName              File name (e.g. /path/to/file.topology)
      *
