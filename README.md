@@ -23,9 +23,10 @@ As a consequence, simulating large flows is generally quicker because the runtim
   pip install git+https://github.com/snkas/python-ortools-lp-parser
   ```
 
-* To use the analysis functionality you need the exputil Python package:
+* To use the analysis functionality you need the numpy and exputil Python package:
 
   ```bash
+  pip install numpy
   pip install git+https://github.com/snkas/exputilpy
   ```
 
