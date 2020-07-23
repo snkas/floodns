@@ -10,7 +10,7 @@
    <dependency>
        <groupId>ch.ethz.systems</groupId>
        <artifactId>floodns</artifactId>
-       <version>3.6.0</version>
+       <version>3.6.1</version>
    </dependency>
    ```
 
