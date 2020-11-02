@@ -1,6 +1,6 @@
 # floodns: temporal routed flow simulation
 
-[![Build Status](https://travis-ci.org/snkas/floodns.svg?branch=master)](https://travis-ci.org/snkas/floodns) [![codecov](https://codecov.io/gh/snkas/floodns/branch/master/graph/badge.svg)](https://codecov.io/gh/snkas/floodns)
+[![Build Status](https://travis-ci.com/snkas/floodns.svg?branch=master)](https://travis-ci.com/snkas/floodns) [![codecov](https://codecov.io/gh/snkas/floodns/branch/master/graph/badge.svg)](https://codecov.io/gh/snkas/floodns)
 
 This is a flow-level simulator to simulate routed flows over time. The abstraction is between a flow optimization (e.g., via a linear program) and a packet-level simulation (e.g., ns-3). It does not model packets, but it calculates the rate of flows over time.
 
